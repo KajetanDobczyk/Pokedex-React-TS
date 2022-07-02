@@ -1,20 +1,18 @@
-import { useContext } from "react";
-
-import { PokedexContext } from "context/PokedexContext";
+import { Pokemon } from "pokenode-ts";
 
 import { PokemonListItem } from "./components/PokemonListItem";
 import * as S from "./styles";
 
-const PokemonList = () => {
-  const { filteredPokemon } = useContext(PokedexContext);
-
-  return (
-    <S.StyledPokemonList>
-      {filteredPokemon?.map((pokemon) => (
-        <PokemonListItem key={pokemon.name} {...pokemon} />
-      ))}
-    </S.StyledPokemonList>
-  );
+type Props = {
+  pokemon: Pokemon[];
 };
+
+const PokemonList = ({ pokemon }: Props) => (
+  <S.StyledPokemonList>
+    {pokemon.map((pokemon) => (
+      <PokemonListItem key={pokemon.name} {...pokemon} />
+    ))}
+  </S.StyledPokemonList>
+);
 
 export default PokemonList;

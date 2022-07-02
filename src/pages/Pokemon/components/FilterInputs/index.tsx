@@ -5,26 +5,26 @@ import { FilterParam, PokedexContext } from "context/PokedexContext";
 import * as S from "./styles";
 
 const FilterInputs = () => {
-  const { filterParams, pokemonTypes, updateFilterParam } = useContext(PokedexContext);
+  const { filters, pokemonTypes } = useContext(PokedexContext);
 
   const handleInputChange =
     (filterParam: FilterParam) =>
     (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) =>
-      updateFilterParam(filterParam, event.target.value);
+      filters.updateFilterParam(filterParam, event.target.value);
 
   return (
     <S.FilterInputsWrapper>
       <S.Input
-        value={filterParams.name}
+        value={filters.params.name}
         onChange={handleInputChange("name")}
         placeholder="Filter by name..."
       />
       Filter by type:
       <S.Select onChange={handleInputChange("type")} defaultValue="">
         <option value="">All</option>
-        {pokemonTypes?.map((type) => (
-          <option key={type.name}>
-            <span>{type.name}</span>
+        {pokemonTypes.data?.map((pokemonType) => (
+          <option key={pokemonType}>
+            <span>{pokemonType}</span>
           </option>
         ))}
       </S.Select>

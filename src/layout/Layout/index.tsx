@@ -1,5 +1,6 @@
-import AppRouter from "../../config/AppRouter";
-import { PokedexContextProvider } from "../../context/PokedexContext";
+import AppRouter from "config/AppRouter";
+import { PokedexContextProvider } from "context/PokedexContext";
+
 import Header from "../Header";
 import * as S from "./styles";
 

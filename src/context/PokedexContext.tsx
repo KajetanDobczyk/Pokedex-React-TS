@@ -1,19 +1,26 @@
 import React, { createContext, useEffect, useState } from "react";
-import { NamedAPIResource, Pokemon, PokemonClient } from "pokenode-ts";
+import { Pokemon, PokemonClient } from "pokenode-ts";
 
 export type FilterParam = "name" | "type";
+type FetchingStatus = "idle" | "inProgress" | "success" | "error";
 
 type FilterParams = Record<FilterParam, string>;
 
+type FetchedResource<R> = {
+  data: R | null;
+  status: FetchingStatus;
+};
+
 type PokedexContextType = {
-  filterParams: FilterParams;
-  updateFilterParam: (filterParam: FilterParam, value: string) => void;
-  pokemonTypes: NamedAPIResource[] | undefined;
-  filteredPokemon?: Pokemon[];
-  singlePokemon?: Pokemon;
-  updateSinglePokemonByName: (name: string) => void;
-  isFetching: boolean;
-  setIsFetching: (isFetching: boolean) => void;
+  filters: {
+    params: FilterParams;
+    updateFilterParam: (filterParam: FilterParam, value: string) => void;
+  };
+  pokemonTypes: FetchedResource<string[]>;
+  filteredPokemon: FetchedResource<Pokemon[]>;
+  singlePokemon: FetchedResource<Pokemon> & {
+    updateSinglePokemonByName: (name: string) => void;
+  };
 };
 
 const initialFilterParams: FilterParams = {
@@ -22,29 +29,58 @@ const initialFilterParams: FilterParams = {
 };
 
 const pokedexContext: PokedexContextType = {
-  filterParams: initialFilterParams,
-  updateFilterParam: () => undefined,
-  pokemonTypes: undefined,
-  filteredPokemon: undefined,
-  singlePokemon: undefined,
-  updateSinglePokemonByName: () => undefined,
-  isFetching: false,
-  setIsFetching: () => undefined,
+  filters: {
+    params: initialFilterParams,
+    updateFilterParam: () => undefined,
+  },
+  pokemonTypes: {
+    data: null,
+    status: "idle",
+  },
+  filteredPokemon: {
+    data: null,
+    status: "idle",
+  },
+  singlePokemon: {
+    data: null,
+    status: "idle",
+    updateSinglePokemonByName: () => undefined,
+  },
 };
 
 export const PokedexContext = createContext<PokedexContextType>(pokedexContext);
 
 const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
-  const [filterParams, setFilterParams] = useState(initialFilterParams);
-  const [pokemonTypes, setPokemonTypes] = useState<NamedAPIResource[] | undefined>(undefined);
-  const [pokemon, setPokemon] = useState<Pokemon[] | undefined>(undefined);
-  const [singlePokemon, setSinglePokemon] = useState<Pokemon | undefined>(undefined);
-  const [isFetching, setIsFetching] = useState(false);
+  const [filtersParams, setFiltersParams] = useState(initialFilterParams);
+
+  const [pokemonTypes, setPokemonTypes] = useState<string[] | null>(null);
+  const [pokemonTypesStatus, setPokemonTypesStatus] = useState<FetchingStatus>("idle");
+
+  const [pokemon, setPokemon] = useState<Pokemon[] | null>(null);
+  const [pokemonStatus, setPokemonStatus] = useState<FetchingStatus>("idle");
+
+  const [singlePokemon, setSinglePokemon] = useState<Pokemon | null>(null);
+  const [singlePokemonStatus, setSinglePokemonStatus] = useState<FetchingStatus>("idle");
 
   const api = new PokemonClient();
 
+  const fetchAllTypes = async () => {
+    setPokemonTypesStatus("inProgress");
+
+    await api
+      .listTypes(0, 1154)
+      .then((data) => {
+        setPokemonTypes(data.results.map((pokemonType) => pokemonType.name));
+        setPokemonTypesStatus("success");
+      })
+      .catch((error) => {
+        console.warn(error);
+        setPokemonTypesStatus("error");
+      });
+  };
+
   const fetchAllPokemon = async () => {
-    setIsFetching(true);
+    setPokemonStatus("inProgress");
 
     await api
       .listPokemons(0, 1154)
@@ -60,67 +96,74 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
         }
 
         setPokemon(fetchedPokemon);
-        setIsFetching(false);
+        setPokemonStatus("success");
       })
-      .catch((error) => console.log(error));
-  };
-
-  const fetchAllTypes = async () => {
-    await api
-      .listTypes(0, 1154)
-      .then((data) => {
-        setPokemonTypes(data.results);
-      })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.warn(error);
+        setPokemonStatus("error");
+      });
   };
 
   useEffect(() => {
-    setIsFetching(true);
     fetchAllTypes();
     fetchAllPokemon(); // I couldn't find a way in documentation to query pokemon list by name / type, so I am loading them all on start...
   }, []);
 
   const updateFilterParam = (filterParam: FilterParam, value: string) => {
-    setFilterParams({ ...filterParams, [filterParam]: value });
+    setFiltersParams({ ...filtersParams, [filterParam]: value });
   };
 
   const updateSinglePokemonByName = async (name: string) => {
-    setIsFetching(true);
+    setSinglePokemonStatus("inProgress");
 
     if (pokemon?.length) {
-      setSinglePokemon(pokemon.find((singlePokemon) => singlePokemon.name === name));
+      const singlePokemon = pokemon.find((singlePokemon) => singlePokemon.name === name) || null;
+
+      setSinglePokemon(singlePokemon);
+      setSinglePokemonStatus(singlePokemon ? "success" : "error");
     } else {
       await api
         .getPokemonByName(name)
         .then(async (data) => {
           setSinglePokemon(data);
-          setIsFetching(false);
+          setSinglePokemonStatus("success");
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          console.warn(error);
+          setSinglePokemonStatus("error");
+        });
     }
-
-    setIsFetching(false);
   };
 
-  const filteredPokemon = pokemon?.filter(
-    (singlePokemon) =>
-      singlePokemon.name.includes(filterParams.name?.toLowerCase() || "") &&
-      singlePokemon.types
-        .map((type) => type.type.name)
-        .find((typeName) => typeName.includes(filterParams.type))
-  );
+  const filteredPokemon =
+    pokemon?.filter(
+      (singlePokemon) =>
+        singlePokemon.name.includes(filtersParams.name.toLowerCase() || "") &&
+        singlePokemon.types
+          .map((type) => type.type.name)
+          .find((typeName) => typeName.includes(filtersParams.type))
+    ) || null;
 
   return (
     <PokedexContext.Provider
       value={{
-        filterParams,
-        updateFilterParam,
-        pokemonTypes,
-        filteredPokemon,
-        singlePokemon,
-        updateSinglePokemonByName,
-        isFetching,
-        setIsFetching,
+        filters: {
+          params: filtersParams,
+          updateFilterParam,
+        },
+        pokemonTypes: {
+          data: pokemonTypes,
+          status: pokemonTypesStatus,
+        },
+        filteredPokemon: {
+          data: filteredPokemon,
+          status: pokemonStatus,
+        },
+        singlePokemon: {
+          data: singlePokemon,
+          status: singlePokemonStatus,
+          updateSinglePokemonByName,
+        },
       }}
     >
       {children}

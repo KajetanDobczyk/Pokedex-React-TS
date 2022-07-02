@@ -1,33 +1,29 @@
 import { useContext } from "react";
-import styled from "@emotion/styled";
 
-import { PokedexContext } from "../../context/PokedexContext";
+import { PokedexContext } from "context/PokedexContext";
+import Message from "common/components/Message";
+
 import PokemonList from "./components/PokemonList";
 import FilterInputs from "./components/FilterInputs";
 
-const FetchingInfo = styled.div`
-  display: block;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding-top: 2rem;
-`;
-
 const Pokemon = () => {
-  const { isFetching } = useContext(PokedexContext);
+  const { filteredPokemon, pokemonTypes } = useContext(PokedexContext);
 
-  if (isFetching) {
-    return (
-      <FetchingInfo>
-        <h2>Initializing Pokemon database, might take a while...</h2>
-      </FetchingInfo>
-    );
+  if (
+    ["idle", "inProgress"].includes(filteredPokemon.status) ||
+    ["idle", "inProgress"].includes(pokemonTypes.status)
+  ) {
+    return <Message text="Initializing Pokemon database, might take a while..." />;
+  }
+
+  if (!filteredPokemon.data || !pokemonTypes.data) {
+    return <Message text="Error downloading the Pokemon database" />;
   }
 
   return (
     <>
       <FilterInputs />
-      <PokemonList />
+      <PokemonList pokemon={filteredPokemon.data} />
     </>
   );
 };
