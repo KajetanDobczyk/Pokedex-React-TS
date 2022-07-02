@@ -2,9 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import emotionReset from "emotion-reset";
 import { Global, css } from "@emotion/react";
+import { BrowserRouter } from "react-router-dom";
 
-import Pokedex from "./App";
 import reportWebVitals from "./reportWebVitals";
+import Layout from "./layout/Layout";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -22,7 +23,9 @@ root.render(
         }
       `}
     />
-    <Pokedex />
+    <BrowserRouter>
+      <Layout />
+    </BrowserRouter>
   </React.StrictMode>
 );
 
