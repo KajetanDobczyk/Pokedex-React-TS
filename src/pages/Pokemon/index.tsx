@@ -1,21 +1,24 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 
-import { PokedexContext } from "../../context/PokedexContext";
+import { FilterParam, PokedexContext } from "../../context/PokedexContext";
 import PokemonList from "./components/PokemonList";
 
 const Pokemon = () => {
-  const { searchParams, updateNameSearchParam } = useContext(PokedexContext);
+  const { filterParams, pokemonTypes, updateFilterParam } = useContext(PokedexContext);
 
-  useEffect(() => {
-    updateNameSearchParam(searchParams.name);
-  }, [searchParams.name]);
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) =>
-    updateNameSearchParam(event.target.value);
+  const handleInputChange =
+    (filterParam: FilterParam) =>
+    (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) =>
+      updateFilterParam(filterParam, event.target.value);
 
   return (
     <>
-      <input value={searchParams.name} onChange={handleInputChange} />
+      <input value={filterParams.name} onChange={handleInputChange("name")} />
+      <select onChange={handleInputChange("type")}>
+        {pokemonTypes?.map((type) => (
+          <option key={type.name}>{type.name}</option>
+        ))}
+      </select>
       <PokemonList />
     </>
   );
