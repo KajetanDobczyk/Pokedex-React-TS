@@ -1,22 +1,22 @@
 import React, { createContext, useEffect, useState } from "react";
-import { PokemonClient, Stat, Type as PokemonType } from "pokenode-ts";
+import { NamedAPIResource, Pokemon, PokemonClient } from "pokenode-ts";
 
 export type FilterParam = "name" | "type";
 
-type FilterParams = Record<FilterParam, string | undefined>;
+type FilterParams = Record<FilterParam, string>;
 
 type PokedexContextType = {
   filterParams: FilterParams;
   updateFilterParam: (filterParam: FilterParam, value: string) => void;
-  pokemonTypes: PokemonType[] | undefined;
-  filteredPokemon?: Stat[];
+  pokemonTypes: NamedAPIResource[] | undefined;
+  filteredPokemon?: Pokemon[];
   isFetching: boolean;
   setIsFetching: (isFetching: boolean) => void;
 };
 
 const initialFilterParams: FilterParams = {
   name: "",
-  type: undefined,
+  type: "",
 };
 
 const pokedexContext: PokedexContextType = {
@@ -32,19 +32,31 @@ export const PokedexContext = createContext<PokedexContextType>(pokedexContext);
 
 const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
   const [filterParams, setFilterParams] = useState(initialFilterParams);
-  const [pokemonTypes, setPokemonTypes] = useState<PokemonType[] | undefined>(undefined);
-  const [pokemon, setPokemon] = useState<Stat[] | undefined>(undefined);
+  const [pokemonTypes, setPokemonTypes] = useState<NamedAPIResource[] | undefined>(undefined);
+  const [pokemon, setPokemon] = useState<Pokemon[] | undefined>(undefined);
   const [isFetching, setIsFetching] = useState(false);
 
   const api = new PokemonClient();
 
   const fetchAllPokemon = async () => {
+    setIsFetching(true);
+
     await api
       .listPokemons(0, 1154)
-      .then((data) => {
-        setPokemon(data.results as any as Stat[]);
+      .then(async (data) => {
+        const pokemonNames = data.results.map((pokemon) => pokemon.name);
+        const fetchedPokemon: Pokemon[] = [];
+
+        for (const name of pokemonNames) {
+          await api
+            .getPokemonByName(name)
+            .then((data) => fetchedPokemon.push(data))
+            .catch((error) => console.log(error));
+        }
+
+        setPokemon(fetchedPokemon);
         setIsFetching(false);
-      }) // I also couldn't find a way to provide type for fetched results with any generic type
+      })
       .catch((error) => console.log(error));
   };
 
@@ -52,8 +64,7 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
     await api
       .listTypes(0, 1154)
       .then((data) => {
-        setPokemonTypes(data.results as any as PokemonType[]);
-        setIsFetching(false);
+        setPokemonTypes(data.results);
       })
       .catch((error) => console.log(error));
   };
@@ -61,18 +72,26 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
   useEffect(() => {
     setIsFetching(true);
     fetchAllTypes();
-    fetchAllPokemon(); // I couldn't find a way in documentation to query pokemon list by name, so I am loading them all.
+    fetchAllPokemon(); // I couldn't find a way in documentation to query pokemon list by name / type, so I am loading them all on start...
   }, []);
 
   const updateFilterParam = (filterParam: FilterParam, value: string) => {
     setFilterParams({ ...filterParams, [filterParam]: value });
   };
 
-  const filteredPokemon = pokemon?.filter((pokemon) =>
-    pokemon.name.includes(filterParams.name?.toLowerCase() || "")
+  const typesNames = pokemon?.map((singlePokemon) =>
+    singlePokemon.types.map((type) => type.type.name)
   );
 
-  console.log(filteredPokemon);
+  console.log(typesNames);
+
+  const filteredPokemon = pokemon?.filter(
+    (singlePokemon) =>
+      singlePokemon.name.includes(filterParams.name?.toLowerCase() || "") &&
+      singlePokemon.types
+        .map((type) => type.type.name)
+        .find((typeName) => typeName.includes(filterParams.type))
+  );
 
   return (
     <PokedexContext.Provider
