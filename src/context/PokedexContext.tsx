@@ -10,6 +10,8 @@ type PokedexContextType = {
   updateFilterParam: (filterParam: FilterParam, value: string) => void;
   pokemonTypes: NamedAPIResource[] | undefined;
   filteredPokemon?: Pokemon[];
+  singlePokemon?: Pokemon;
+  updateSinglePokemonByName: (name: string) => void;
   isFetching: boolean;
   setIsFetching: (isFetching: boolean) => void;
 };
@@ -24,6 +26,8 @@ const pokedexContext: PokedexContextType = {
   updateFilterParam: () => undefined,
   pokemonTypes: undefined,
   filteredPokemon: undefined,
+  singlePokemon: undefined,
+  updateSinglePokemonByName: () => undefined,
   isFetching: false,
   setIsFetching: () => undefined,
 };
@@ -34,6 +38,7 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
   const [filterParams, setFilterParams] = useState(initialFilterParams);
   const [pokemonTypes, setPokemonTypes] = useState<NamedAPIResource[] | undefined>(undefined);
   const [pokemon, setPokemon] = useState<Pokemon[] | undefined>(undefined);
+  const [singlePokemon, setSinglePokemon] = useState<Pokemon | undefined>(undefined);
   const [isFetching, setIsFetching] = useState(false);
 
   const api = new PokemonClient();
@@ -79,11 +84,23 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
     setFilterParams({ ...filterParams, [filterParam]: value });
   };
 
-  const typesNames = pokemon?.map((singlePokemon) =>
-    singlePokemon.types.map((type) => type.type.name)
-  );
+  const updateSinglePokemonByName = async (name: string) => {
+    setIsFetching(true);
 
-  console.log(typesNames);
+    if (pokemon?.length) {
+      setSinglePokemon(pokemon.find((singlePokemon) => singlePokemon.name === name));
+    } else {
+      await api
+        .getPokemonByName(name)
+        .then(async (data) => {
+          setSinglePokemon(data);
+          setIsFetching(false);
+        })
+        .catch((error) => console.log(error));
+    }
+
+    setIsFetching(false);
+  };
 
   const filteredPokemon = pokemon?.filter(
     (singlePokemon) =>
@@ -100,6 +117,8 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
         updateFilterParam,
         pokemonTypes,
         filteredPokemon,
+        singlePokemon,
+        updateSinglePokemonByName,
         isFetching,
         setIsFetching,
       }}

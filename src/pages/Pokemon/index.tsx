@@ -1,33 +1,32 @@
 import { useContext } from "react";
 import styled from "@emotion/styled";
 
-import { FilterParam, PokedexContext } from "../../context/PokedexContext";
+import { PokedexContext } from "../../context/PokedexContext";
 import PokemonList from "./components/PokemonList";
+import FilterInputs from "./components/FilterInputs";
 
-const FetchingInfo = styled.h2`
+const FetchingInfo = styled.div`
   display: block;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 2rem;
 `;
 
 const Pokemon = () => {
-  const { filterParams, pokemonTypes, updateFilterParam, isFetching } = useContext(PokedexContext);
-
-  const handleInputChange =
-    (filterParam: FilterParam) =>
-    (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) =>
-      updateFilterParam(filterParam, event.target.value);
+  const { isFetching } = useContext(PokedexContext);
 
   if (isFetching) {
-    return <FetchingInfo>Initializing Pokemon database, might take a while...</FetchingInfo>;
+    return (
+      <FetchingInfo>
+        <h2>Initializing Pokemon database, might take a while...</h2>
+      </FetchingInfo>
+    );
   }
 
   return (
     <>
-      <input value={filterParams.name} onChange={handleInputChange("name")} />
-      <select onChange={handleInputChange("type")}>
-        {pokemonTypes?.map((type) => (
-          <option key={type.name}>{type.name}</option>
-        ))}
-      </select>
+      <FilterInputs />
       <PokemonList />
     </>
   );
