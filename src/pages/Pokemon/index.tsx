@@ -1,13 +1,17 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 
 import { PokedexContext } from "../../context/PokedexContext";
 import PokemonList from "./components/PokemonList";
 
 const Pokemon = () => {
-  const { searchParams, setSearchName } = useContext(PokedexContext);
+  const { searchParams, updateNameSearchParam } = useContext(PokedexContext);
+
+  useEffect(() => {
+    updateNameSearchParam(searchParams.name);
+  }, [searchParams.name]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setSearchName(event.target.value);
+    updateNameSearchParam(event.target.value);
 
   return (
     <>
