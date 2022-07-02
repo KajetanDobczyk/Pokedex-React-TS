@@ -15,17 +15,17 @@ const FilterInputs = () => {
   return (
     <S.FilterInputsWrapper>
       <S.Input
+        type="text"
+        aria-label="name"
         value={filters.params.name}
         onChange={handleInputChange("name")}
         placeholder="Filter by name..."
       />
       Filter by type:
-      <S.Select onChange={handleInputChange("type")} defaultValue="">
+      <S.Select onChange={handleInputChange("type")} defaultValue="" aria-label="type">
         <option value="">All</option>
         {pokemonTypes.data?.map((pokemonType) => (
-          <option key={pokemonType}>
-            <span>{pokemonType}</span>
-          </option>
+          <option key={pokemonType}>{pokemonType}</option>
         ))}
       </S.Select>
     </S.FilterInputsWrapper>

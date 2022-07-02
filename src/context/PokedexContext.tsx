@@ -74,7 +74,6 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
         setPokemonTypesStatus("success");
       })
       .catch((error) => {
-        console.warn(error);
         setPokemonTypesStatus("error");
       });
   };
@@ -99,7 +98,6 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
         setPokemonStatus("success");
       })
       .catch((error) => {
-        console.warn(error);
         setPokemonStatus("error");
       });
   };
@@ -129,7 +127,6 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
           setSinglePokemonStatus("success");
         })
         .catch((error) => {
-          console.warn(error);
           setSinglePokemonStatus("error");
         });
     }
