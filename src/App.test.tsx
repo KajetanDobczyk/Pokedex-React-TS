@@ -1,9 +1,11 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen } from "@testing-library/react";
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+import Pokedex from "./App";
+
+test("renders Pokedex text", () => {
+  render(<Pokedex />);
+
+  const baseText = screen.getByText(/pokedex/i);
+
+  expect(baseText).toBeInTheDocument();
 });
