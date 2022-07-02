@@ -1,8 +1,4 @@
-import styled from "@emotion/styled";
-
-const PokemonInfoPieceWrapper = styled.div`
-  margin: 1rem 0;
-`;
+import * as S from "./styles";
 
 type Props = {
   header: string;
@@ -10,10 +6,10 @@ type Props = {
 };
 
 const PokemonInfoPiece = ({ header, text }: Props) => (
-  <PokemonInfoPieceWrapper>
+  <S.PokemonInfoPieceWrapper>
     <h3>{header}:</h3>
     <p>{text}</p>
-  </PokemonInfoPieceWrapper>
+  </S.PokemonInfoPieceWrapper>
 );
 
 export default PokemonInfoPiece;

@@ -1,15 +1,12 @@
 import { Link } from "react-router-dom";
-import styled from "@emotion/styled";
 
-const Nav = styled.nav`
-  padding: 2rem;
-  border-bottom: 1px solid #ccc;
-`;
+import * as S from "./styles";
 
 const Header = () => (
-  <Nav>
+  <S.Nav>
+    <S.StyledLogo />
     <Link to="/pokemon">Pokedex</Link>
-  </Nav>
+  </S.Nav>
 );
 
 export default Header;

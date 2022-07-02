@@ -22,6 +22,11 @@ export const PokemonListItemWrapper = styled.li`
   }
 `;
 
-export const PokemonName = styled.span`
+export const Sprite = styled.img`
+  max-width: 200px;
+  height: auto;
+`;
+
+export const Name = styled.span`
   margin-left: 1rem;
 `;

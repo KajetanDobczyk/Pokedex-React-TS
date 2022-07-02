@@ -7,9 +7,9 @@ export const PokemonListItem = (pokemon: Pokemon) => (
   <S.PokemonListItemWrapper>
     <Link to={`/pokemon/${pokemon.name}`}>
       {pokemon.sprites.front_default && (
-        <img src={pokemon.sprites.front_default} alt={pokemon.name} />
+        <S.Sprite src={pokemon.sprites.front_default} alt={pokemon.name} />
       )}
-      <S.PokemonName>{pokemon.name}</S.PokemonName>
+      <S.Name>{pokemon.name}</S.Name>
     </Link>
   </S.PokemonListItemWrapper>
 );
