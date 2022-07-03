@@ -13,7 +13,7 @@ const PokemonDetails = () => {
   const { singlePokemon } = useContext(PokedexContext);
 
   useEffect(() => {
-    if (name && singlePokemon.status === "idle") {
+    if (name && singlePokemon.data?.name !== name) {
       singlePokemon.updateSinglePokemonByName(name);
     }
   }, []);

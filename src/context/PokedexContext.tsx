@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useState } from "react";
 import { Pokemon } from "pokenode-ts";
 
 import api from "api";
@@ -18,8 +18,12 @@ type PokedexContextType = {
     params: FilterParams;
     updateFilterParam: (filterParam: FilterParam, value: string) => void;
   };
-  pokemonTypes: FetchedResource<string[]>;
-  filteredPokemon: FetchedResource<Pokemon[]>;
+  pokemonTypes: FetchedResource<string[]> & {
+    fetchAll: () => void;
+  };
+  filteredPokemon: FetchedResource<Pokemon[]> & {
+    fetchAll: () => void;
+  };
   singlePokemon: FetchedResource<Pokemon> & {
     updateSinglePokemonByName: (name: string) => void;
   };
@@ -38,10 +42,12 @@ const pokedexContext: PokedexContextType = {
   pokemonTypes: {
     data: null,
     status: "idle",
+    fetchAll: () => undefined,
   },
   filteredPokemon: {
     data: null,
     status: "idle",
+    fetchAll: () => undefined,
   },
   singlePokemon: {
     data: null,
@@ -107,24 +113,19 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
       });
   };
 
-  useEffect(() => {
-    fetchAllTypes();
-    fetchAllPokemon(); // I couldn't find a way in documentation to query pokemon list by name / type, so I am loading them all on start...
-  }, []);
-
   const updateFilterParam = (filterParam: FilterParam, value: string) => {
     setFiltersParams({ ...filtersParams, [filterParam]: value });
   };
 
   const updateSinglePokemonByName = async (name: string) => {
-    setSinglePokemonStatus("inProgress");
-
     if (pokemon?.length) {
       const singlePokemon = pokemon.find((singlePokemon) => singlePokemon.name === name) || null;
 
       setSinglePokemon(singlePokemon);
       setSinglePokemonStatus(singlePokemon ? "success" : "error");
     } else {
+      setSinglePokemonStatus("inProgress");
+
       await api.pokemon
         .getPokemonByName(name)
         .then(async (data) => {
@@ -157,10 +158,12 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
         pokemonTypes: {
           data: pokemonTypes,
           status: pokemonTypesStatus,
+          fetchAll: fetchAllTypes,
         },
         filteredPokemon: {
           data: filteredPokemon,
           status: pokemonStatus,
+          fetchAll: fetchAllPokemon,
         },
         singlePokemon: {
           data: singlePokemon,

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { CircularProgress } from "@chakra-ui/react";
 
 import { PokedexContext } from "context/PokedexContext";
@@ -9,6 +9,16 @@ import FilterInputs from "./components/FilterInputs";
 
 const Pokemon = () => {
   const { filteredPokemon, pokemonTypes } = useContext(PokedexContext);
+
+  useEffect(() => {
+    if (pokemonTypes.status === "idle") {
+      pokemonTypes.fetchAll();
+    }
+
+    if (filteredPokemon.status === "idle") {
+      filteredPokemon.fetchAll();
+    }
+  }, []);
 
   if (
     ["idle", "inProgress"].includes(filteredPokemon.status) ||
