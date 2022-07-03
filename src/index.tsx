@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import emotionReset from "emotion-reset";
 import { Global, css } from "@emotion/react";
 import { BrowserRouter } from "react-router-dom";
+import { ChakraProvider } from "@chakra-ui/react";
 
 import reportWebVitals from "./reportWebVitals";
 import Layout from "./layout/Layout";
@@ -24,7 +25,9 @@ root.render(
       `}
     />
     <BrowserRouter>
-      <Layout />
+      <ChakraProvider>
+        <Layout />
+      </ChakraProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

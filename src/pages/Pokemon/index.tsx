@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { CircularProgress } from "@chakra-ui/react";
 
 import { PokedexContext } from "context/PokedexContext";
 import Message from "common/components/Message";
@@ -13,7 +14,11 @@ const Pokemon = () => {
     ["idle", "inProgress"].includes(filteredPokemon.status) ||
     ["idle", "inProgress"].includes(pokemonTypes.status)
   ) {
-    return <Message text="Initializing Pokemon database, might take a while..." />;
+    return (
+      <Message text="Initializing Pokemon database, might take a while...">
+        <CircularProgress isIndeterminate />
+      </Message>
+    );
   }
 
   if (!filteredPokemon.data || !pokemonTypes.data) {

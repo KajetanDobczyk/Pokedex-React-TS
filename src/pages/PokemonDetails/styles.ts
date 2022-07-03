@@ -1,3 +1,4 @@
+import { Heading } from "@chakra-ui/react";
 import styled from "@emotion/styled";
 
 export const PokemonDetailsWrapper = styled.div`
@@ -10,7 +11,7 @@ export const PokemonInfo = styled.div`
   margin-top: 2rem;
 `;
 
-export const Name = styled.h2`
+export const Name = styled(Heading)`
   text-transform: capitalize;
 `;
 

@@ -1,14 +1,16 @@
+import { StatLabel, StatNumber } from "@chakra-ui/react";
+
 import * as S from "./styles";
 
 type Props = {
-  header: string;
+  label: string;
   text: string;
 };
 
-const PokemonInfoPiece = ({ header, text }: Props) => (
+const PokemonInfoPiece = ({ label, text }: Props) => (
   <S.PokemonInfoPieceWrapper>
-    <h3>{header}:</h3>
-    <p>{text}</p>
+    <StatLabel>{label}</StatLabel>
+    <StatNumber>{text}</StatNumber>
   </S.PokemonInfoPieceWrapper>
 );
 

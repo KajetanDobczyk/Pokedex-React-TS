@@ -32,14 +32,14 @@ const PokemonDetails = () => {
     <S.PokemonDetailsWrapper>
       <Link to="/pokemon">Go back to pokemon list</Link>
       <S.PokemonInfo>
-        <S.Name>{pokemonData.name}</S.Name>
+        <S.Name size="lg">{pokemonData.name}</S.Name>
         {pokemonData.sprites.front_default && (
           <S.Sprite src={pokemonData.sprites.front_default} alt={pokemonData.name} />
         )}
-        <PokemonInfoPiece header="Order" text={pokemonData.order.toString()} />
-        <PokemonInfoPiece header="Base experience" text={pokemonData.base_experience.toString()} />
+        <PokemonInfoPiece label="Order" text={pokemonData.order.toString()} />
+        <PokemonInfoPiece label="Base experience" text={pokemonData.base_experience.toString()} />
         <PokemonInfoPiece
-          header="Types"
+          label="Types"
           text={pokemonData.types.map((type) => type.type.name).join(", ")}
         />
       </S.PokemonInfo>

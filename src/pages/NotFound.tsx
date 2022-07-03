@@ -1,9 +1,12 @@
+import { Text } from "@chakra-ui/react";
+
+import Message from "common/components/Message";
+
 const NotFound = () => (
-  <main>
-    <h1>Browser is confused...</h1>
-    <p>It Hurt Itself in Its Confusion!</p>
-    <p>Page not found!</p>
-  </main>
+  <Message text="Browser is confused..." status="error">
+    <Text>It Hurt Itself in Its Confusion!</Text>
+    <Text>Page not found!</Text>
+  </Message>
 );
 
 export default NotFound;

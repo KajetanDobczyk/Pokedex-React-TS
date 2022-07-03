@@ -1,8 +1,6 @@
+import { SimpleGrid } from "@chakra-ui/react";
 import styled from "@emotion/styled";
 
-export const StyledPokemonList = styled.ul`
-  list-style-type: none;
-  display: flex;
-  flex-direction: column;
-  padding: 1rem 2rem 1rem;
+export const StyledGrid = styled(SimpleGrid)`
+  padding: 1rem;
 `;
