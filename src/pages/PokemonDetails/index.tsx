@@ -16,6 +16,7 @@ const PokemonDetails = () => {
     if (name && singlePokemon.data?.name !== name) {
       singlePokemon.updateSinglePokemonByName(name);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (["idle", "inProgress"].includes(singlePokemon.status)) {

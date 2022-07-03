@@ -18,6 +18,7 @@ const Pokemon = () => {
     if (filteredPokemon.status === "idle") {
       filteredPokemon.fetchAll();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (
