@@ -1,9 +1,10 @@
 import { rest } from "msw";
-import { fireEvent, screen, waitForElementToBeRemoved } from "@testing-library/react";
+import { fireEvent, render, screen, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { BrowserRouter } from "react-router-dom";
 
-import { renderWithProviders } from "config/testUtils";
 import { pokemonServer } from "api/pokemon/testsSetup";
+import { PokedexContextProvider } from "context/PokedexContext";
 
 import Pokemon from ".";
 
@@ -11,8 +12,17 @@ beforeAll(() => pokemonServer.listen());
 afterEach(() => pokemonServer.resetHandlers());
 afterAll(() => pokemonServer.close());
 
+const renderPokemon = () =>
+  render(
+    <BrowserRouter>
+      <PokedexContextProvider>
+        <Pokemon />
+      </PokedexContextProvider>
+    </BrowserRouter>
+  );
+
 test("renders loading message and then filters and Pokemon list with correct data from API", async () => {
-  renderWithProviders(<Pokemon />);
+  renderPokemon();
 
   expect(screen.getByText(/Initializing/i)).toBeInTheDocument();
   await waitForElementToBeRemoved(() => screen.queryByText(/Initializing/i));
@@ -32,7 +42,7 @@ test("renders error message with data types error from API", async () => {
     })
   );
 
-  renderWithProviders(<Pokemon />);
+  renderPokemon();
 
   expect(screen.getByText(/Initializing/i)).toBeInTheDocument();
   await waitForElementToBeRemoved(() => screen.queryByText(/Initializing/i));
@@ -46,7 +56,7 @@ test("renders error message with pokemon error from API", async () => {
     })
   );
 
-  renderWithProviders(<Pokemon />);
+  renderPokemon();
 
   expect(screen.getByText(/Initializing/i)).toBeInTheDocument();
   await waitForElementToBeRemoved(() => screen.queryByText(/Initializing/i));
@@ -54,7 +64,7 @@ test("renders error message with pokemon error from API", async () => {
 });
 
 test("filters pokemon by name and type correctly", async () => {
-  renderWithProviders(<Pokemon />);
+  renderPokemon();
 
   await screen.findByText("bulbasaur");
 

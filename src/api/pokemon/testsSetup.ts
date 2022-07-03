@@ -51,6 +51,7 @@ export const pokemonServer = setupServer(
       ctx.json({
         base_experience: 64,
         id: 1,
+        order: 1,
         name: "bulbasaur",
         types: [
           { slot: 1, type: { name: "grass", url: "https://pokeapi.co/api/v2/type/12/" } },
@@ -68,6 +69,7 @@ export const pokemonServer = setupServer(
       ctx.json({
         base_experience: 142,
         id: 2,
+        order: 2,
         name: "ivysaur",
         types: [
           { slot: 1, type: { name: "grass", url: "https://pokeapi.co/api/v2/type/12/" } },
@@ -85,6 +87,7 @@ export const pokemonServer = setupServer(
       ctx.json({
         base_experience: 63,
         id: 7,
+        order: 7,
         name: "squirtle",
         types: [{ slot: 1, type: { name: "water", url: "https://pokeapi.co/api/v2/type/11/" } }],
         sprites: {

@@ -74,6 +74,7 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
         setPokemonTypesStatus("success");
       })
       .catch((error) => {
+        setPokemonTypes(null);
         setPokemonTypesStatus("error");
       });
   };
@@ -91,13 +92,17 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
           await api.pokemon
             .getPokemonByName(name)
             .then((data) => fetchedPokemon.push(data))
-            .catch((error) => console.log(error));
+            .catch((error) => {
+              setPokemon(null);
+              setPokemonStatus("error");
+            });
         }
 
         setPokemon(fetchedPokemon);
         setPokemonStatus("success");
       })
       .catch((error) => {
+        setPokemon(null);
         setPokemonStatus("error");
       });
   };
@@ -127,6 +132,7 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
           setSinglePokemonStatus("success");
         })
         .catch((error) => {
+          setSinglePokemon(null);
           setSinglePokemonStatus("error");
         });
     }
