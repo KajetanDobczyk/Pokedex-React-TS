@@ -1,7 +1,6 @@
 import styled from "@emotion/styled";
 
 export const PokemonListItemWrapper = styled.li`
-  padding: 1rem;
   margin-bottom: 1rem;
   border: 1px solid #ccc;
   border-radius: 0.5rem;
@@ -12,6 +11,7 @@ export const PokemonListItemWrapper = styled.li`
   }
 
   a {
+    padding: 1rem;
     text-decoration: none;
     text-transform: capitalize;
     color: #000;

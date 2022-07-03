@@ -1,110 +1,15 @@
 import { rest } from "msw";
-import { setupServer } from "msw/node";
-import { screen, waitForElementToBeRemoved } from "@testing-library/react";
+import { fireEvent, screen, waitForElementToBeRemoved } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 import { renderWithProviders } from "config/testUtils";
+import { pokemonServer } from "api/pokemon/testsSetup";
 
 import Pokemon from ".";
 
-const server = setupServer(
-  rest.get("https://pokeapi.co/api/v2/type", (req, res, ctx) => {
-    return res(
-      ctx.json({
-        results: [
-          {
-            name: "grass",
-            url: "https://pokeapi.co/api/v2/type/12/",
-          },
-          {
-            name: "poison",
-            url: "https://pokeapi.co/api/v2/type/4/",
-          },
-          {
-            name: "water",
-            url: "https://pokeapi.co/api/v2/type/11/",
-          },
-          {
-            name: "ghost",
-            url: "https://pokeapi.co/api/v2/type/8/",
-          },
-        ],
-      })
-    );
-  }),
-  rest.get("https://pokeapi.co/api/v2/pokemon", (req, res, ctx) => {
-    return res(
-      ctx.json({
-        results: [
-          {
-            name: "bulbasaur",
-            url: "https://pokeapi.co/api/v2/pokemon/1/",
-          },
-          {
-            name: "ivysaur",
-            url: "https://pokeapi.co/api/v2/pokemon/2/",
-          },
-          {
-            name: "squirtle",
-            url: "https://pokeapi.co/api/v2/pokemon/7/",
-          },
-        ],
-      })
-    );
-  }),
-  rest.get("https://pokeapi.co/api/v2/pokemon/bulbasaur", (req, res, ctx) => {
-    return res(
-      ctx.json({
-        base_experience: 64,
-        id: 1,
-        name: "bulbasaur",
-        types: [
-          { slot: 1, type: { name: "grass", url: "https://pokeapi.co/api/v2/type/12/" } },
-          { slot: 2, type: { name: "poison", url: "https://pokeapi.co/api/v2/type/4/" } },
-        ],
-        sprites: {
-          front_default:
-            "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
-        },
-      })
-    );
-  }),
-  rest.get("https://pokeapi.co/api/v2/pokemon/ivysaur", (req, res, ctx) => {
-    return res(
-      ctx.json({
-        base_experience: 142,
-        id: 2,
-        name: "ivysaur",
-        types: [
-          { slot: 1, type: { name: "grass", url: "https://pokeapi.co/api/v2/type/12/" } },
-          { slot: 2, type: { name: "poison", url: "https://pokeapi.co/api/v2/type/4/" } },
-        ],
-        sprites: {
-          front_default:
-            "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
-        },
-      })
-    );
-  }),
-  rest.get("https://pokeapi.co/api/v2/pokemon/squirtle", (req, res, ctx) => {
-    return res(
-      ctx.json({
-        base_experience: 63,
-        id: 7,
-        name: "squirtle",
-        types: [{ slot: 1, type: { name: "water", url: "https://pokeapi.co/api/v2/type/11/" } }],
-        sprites: {
-          front_default:
-            "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
-        },
-      })
-    );
-  })
-);
-
-beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
+beforeAll(() => pokemonServer.listen());
+afterEach(() => pokemonServer.resetHandlers());
+afterAll(() => pokemonServer.close());
 
 test("renders loading message and then filters and Pokemon list with correct data from API", async () => {
   renderWithProviders(<Pokemon />);
@@ -121,7 +26,7 @@ test("renders loading message and then filters and Pokemon list with correct dat
 });
 
 test("renders error message with data types error from API", async () => {
-  server.use(
+  pokemonServer.use(
     rest.get("https://pokeapi.co/api/v2/type", (req, res, ctx) => {
       return res(ctx.status(500));
     })
@@ -131,11 +36,11 @@ test("renders error message with data types error from API", async () => {
 
   expect(screen.getByText(/Initializing/i)).toBeInTheDocument();
   await waitForElementToBeRemoved(() => screen.queryByText(/Initializing/i));
-  await screen.findByText("Error downloading the Pokemon database");
+  await screen.findByText(/Error/i);
 });
 
 test("renders error message with pokemon error from API", async () => {
-  server.use(
+  pokemonServer.use(
     rest.get("https://pokeapi.co/api/v2/pokemon", (req, res, ctx) => {
       return res(ctx.status(500));
     })
@@ -145,5 +50,59 @@ test("renders error message with pokemon error from API", async () => {
 
   expect(screen.getByText(/Initializing/i)).toBeInTheDocument();
   await waitForElementToBeRemoved(() => screen.queryByText(/Initializing/i));
-  await screen.findByText("Error downloading the Pokemon database");
+  await screen.findByText(/Error/i);
+});
+
+test("filters pokemon by name and type correctly", async () => {
+  renderWithProviders(<Pokemon />);
+
+  await screen.findByText("bulbasaur");
+
+  const nameInput = screen.getByRole("textbox", { name: "name" });
+  const typeInput = screen.getByRole("combobox", { name: "type" });
+
+  expect(nameInput).toBeInTheDocument();
+  expect(typeInput).toBeInTheDocument();
+
+  expect(screen.getByText("bulbasaur")).toBeInTheDocument();
+  expect(screen.getByText("ivysaur")).toBeInTheDocument();
+  expect(screen.getByText("squirtle")).toBeInTheDocument();
+
+  fireEvent.change(nameInput, { target: { value: "bul" } });
+
+  expect(screen.getByText("bulbasaur")).toBeInTheDocument();
+  expect(screen.queryByText("ivysaur")).toBeNull();
+  expect(screen.queryByText("squirtle")).toBeNull();
+
+  fireEvent.change(nameInput, { target: { value: "i" } });
+
+  expect(screen.queryByText("bulbasaur")).toBeNull();
+  expect(screen.getByText("ivysaur")).toBeInTheDocument();
+  expect(screen.getByText("squirtle")).toBeInTheDocument();
+
+  fireEvent.change(typeInput, { target: { value: "water" } });
+
+  expect(screen.queryByText("bulbasaur")).toBeNull();
+  expect(screen.queryByText("ivysaur")).toBeNull();
+  expect(screen.getByText("squirtle")).toBeInTheDocument();
+
+  fireEvent.change(typeInput, { target: { value: "ghost" } });
+
+  expect(screen.queryByText("bulbasaur")).toBeNull();
+  expect(screen.queryByText("ivysaur")).toBeNull();
+  expect(screen.queryByText("squirtle")).toBeNull();
+
+  fireEvent.change(nameInput, { target: { value: "squirtle" } });
+
+  expect(screen.queryByText("bulbasaur")).toBeNull();
+  expect(screen.queryByText("ivysaur")).toBeNull();
+  expect(screen.queryByText("squirtle")).toBeNull();
+  expect(screen.getByText(/No pokemons/i)).toBeInTheDocument();
+
+  fireEvent.change(typeInput, { target: { value: "water" } });
+
+  expect(screen.queryByText(/No pokemons/i)).toBeNull();
+  expect(screen.queryByText("bulbasaur")).toBeNull();
+  expect(screen.queryByText("ivysaur")).toBeNull();
+  expect(screen.getByText("squirtle")).toBeInTheDocument();
 });

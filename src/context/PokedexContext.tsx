@@ -1,5 +1,7 @@
 import React, { createContext, useEffect, useState } from "react";
-import { Pokemon, PokemonClient } from "pokenode-ts";
+import { Pokemon } from "pokenode-ts";
+
+import api from "api";
 
 export type FilterParam = "name" | "type";
 type FetchingStatus = "idle" | "inProgress" | "success" | "error";
@@ -62,12 +64,10 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
   const [singlePokemon, setSinglePokemon] = useState<Pokemon | null>(null);
   const [singlePokemonStatus, setSinglePokemonStatus] = useState<FetchingStatus>("idle");
 
-  const api = new PokemonClient();
-
   const fetchAllTypes = async () => {
     setPokemonTypesStatus("inProgress");
 
-    await api
+    await api.pokemon
       .listTypes(0, 1154)
       .then((data) => {
         setPokemonTypes(data.results.map((pokemonType) => pokemonType.name));
@@ -81,14 +81,14 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
   const fetchAllPokemon = async () => {
     setPokemonStatus("inProgress");
 
-    await api
+    await api.pokemon
       .listPokemons(0, 1154)
       .then(async (data) => {
         const pokemonNames = data.results.map((pokemon) => pokemon.name);
         const fetchedPokemon: Pokemon[] = [];
 
         for (const name of pokemonNames) {
-          await api
+          await api.pokemon
             .getPokemonByName(name)
             .then((data) => fetchedPokemon.push(data))
             .catch((error) => console.log(error));
@@ -120,7 +120,7 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
       setSinglePokemon(singlePokemon);
       setSinglePokemonStatus(singlePokemon ? "success" : "error");
     } else {
-      await api
+      await api.pokemon
         .getPokemonByName(name)
         .then(async (data) => {
           setSinglePokemon(data);
