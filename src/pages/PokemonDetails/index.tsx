@@ -12,40 +12,42 @@ const PokemonDetails = () => {
 
   const { singlePokemon } = useContext(PokedexContext);
 
-  useEffect(() => {
-    if (name && singlePokemon.data?.name !== name) {
-      singlePokemon.updateSinglePokemonByName(name);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   if (name && singlePokemon.data?.name !== name) {
+  //     singlePokemon.updateSinglePokemonByName(name);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
-  if (["idle", "inProgress"].includes(singlePokemon.status)) {
-    return <Message text="Getting pokemon info, please wait..." />;
-  }
+  // if (["idle", "inProgress"].includes(singlePokemon.status)) {
+  //   return <Message text="Getting pokemon info, please wait..." />;
+  // }
 
-  if (!singlePokemon.data) {
-    return <Message text="Couldn't find a pokemon with this name!" />;
-  }
+  // if (!singlePokemon.data) {
+  //   return <Message text="Couldn't find a pokemon with this name!" />;
+  // }
 
-  const pokemonData = singlePokemon.data;
+  // const pokemonData = singlePokemon.data;
 
-  return (
-    <S.PokemonDetailsWrapper>
-      <Link to="/pokemon">Go back to pokemon list</Link>
-      <S.PokemonInfo>
-        <S.Name size="lg">{pokemonData.name}</S.Name>
-        {pokemonData.sprites.front_default && (
-          <S.Sprite src={pokemonData.sprites.front_default} alt={pokemonData.name} />
-        )}
-        <PokemonInfoPiece label="Order" text={pokemonData.order.toString()} />
-        <PokemonInfoPiece label="Base experience" text={pokemonData.base_experience.toString()} />
-        <PokemonInfoPiece
-          label="Types"
-          text={pokemonData.types.map((type) => type.type.name).join(", ")}
-        />
-      </S.PokemonInfo>
-    </S.PokemonDetailsWrapper>
-  );
+  // return (
+  //   <S.PokemonDetailsWrapper>
+  //     <Link to="/pokemon">Go back to pokemon list</Link>
+  //     <S.PokemonInfo>
+  //       <S.Name size="lg">{pokemonData.name}</S.Name>
+  //       {pokemonData.sprites.front_default && (
+  //         <S.Sprite src={pokemonData.sprites.front_default} alt={pokemonData.name} />
+  //       )}
+  //       <PokemonInfoPiece label="Order" text={pokemonData.order.toString()} />
+  //       <PokemonInfoPiece label="Base experience" text={pokemonData.base_experience.toString()} />
+  //       <PokemonInfoPiece
+  //         label="Types"
+  //         text={pokemonData.types.map((type) => type.type.name).join(", ")}
+  //       />
+  //     </S.PokemonInfo>
+  //   </S.PokemonDetailsWrapper>
+  // );
+
+  return null;
 };
 
 export default PokemonDetails;

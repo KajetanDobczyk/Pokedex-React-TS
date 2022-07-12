@@ -1,7 +1,7 @@
-import React, { createContext, useState } from "react";
-import { Pokemon } from "pokenode-ts";
+import React, { createContext, useEffect, useState } from "react";
 
 import api from "api";
+import { Pokemon } from "api/mockedApi/client";
 
 export type FilterParam = "name" | "type";
 type FetchingStatus = "idle" | "inProgress" | "success" | "error";
@@ -70,47 +70,37 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
   const [singlePokemon, setSinglePokemon] = useState<Pokemon | null>(null);
   const [singlePokemonStatus, setSinglePokemonStatus] = useState<FetchingStatus>("idle");
 
+  useEffect(() => {
+    fetchAllPokemon();
+  }, [filtersParams]);
+
+  useEffect(() => {
+    fetchAllTypes();
+  }, []);
+
   const fetchAllTypes = async () => {
     setPokemonTypesStatus("inProgress");
 
-    await api.pokemon
-      .listTypes(0, 1154)
-      .then((data) => {
-        setPokemonTypes(data.results.map((pokemonType) => pokemonType.name));
-        setPokemonTypesStatus("success");
-      })
-      .catch((error) => {
-        setPokemonTypes(null);
-        setPokemonTypesStatus("error");
-      });
+    setPokemonTypes(api.pokemon.listTypes());
+    setPokemonTypesStatus("success");
   };
 
   const fetchAllPokemon = async () => {
     setPokemonStatus("inProgress");
 
-    await api.pokemon
-      .listPokemons(0, 1154)
-      .then(async (data) => {
-        const pokemonNames = data.results.map((pokemon) => pokemon.name);
-        const fetchedPokemon: Pokemon[] = [];
+    if (!filtersParams.name.length && !filtersParams.type.length) {
+      setPokemon([]);
+      setPokemonStatus("success");
+      return;
+    }
 
-        for (const name of pokemonNames) {
-          await api.pokemon
-            .getPokemonByName(name)
-            .then((data) => fetchedPokemon.push(data))
-            .catch((error) => {
-              setPokemon(null);
-              setPokemonStatus("error");
-            });
-        }
+    const fetchedPokemon = api.pokemon.listPokemon({
+      name: filtersParams.name,
+      type: filtersParams.type,
+    });
 
-        setPokemon(fetchedPokemon);
-        setPokemonStatus("success");
-      })
-      .catch((error) => {
-        setPokemon(null);
-        setPokemonStatus("error");
-      });
+    setPokemon(fetchedPokemon);
+    setPokemonStatus("success");
   };
 
   const updateFilterParam = (filterParam: FilterParam, value: string) => {
@@ -118,35 +108,24 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
   };
 
   const updateSinglePokemonByName = async (name: string) => {
-    if (pokemon?.length) {
-      const singlePokemon = pokemon.find((singlePokemon) => singlePokemon.name === name) || null;
-
-      setSinglePokemon(singlePokemon);
-      setSinglePokemonStatus(singlePokemon ? "success" : "error");
-    } else {
-      setSinglePokemonStatus("inProgress");
-
-      await api.pokemon
-        .getPokemonByName(name)
-        .then(async (data) => {
-          setSinglePokemon(data);
-          setSinglePokemonStatus("success");
-        })
-        .catch((error) => {
-          setSinglePokemon(null);
-          setSinglePokemonStatus("error");
-        });
-    }
+    // if (pokemon?.length) {
+    //   const singlePokemon = pokemon.find((singlePokemon) => singlePokemon.name === name) || null;
+    //   setSinglePokemon(singlePokemon);
+    //   setSinglePokemonStatus(singlePokemon ? "success" : "error");
+    // } else {
+    //   setSinglePokemonStatus("inProgress");
+    //   await api.pokemon
+    //     .getPokemonByName(name)
+    //     .then(async (data) => {
+    //       setSinglePokemon(data);
+    //       setSinglePokemonStatus("success");
+    //     })
+    //     .catch((error) => {
+    //       setSinglePokemon(null);
+    //       setSinglePokemonStatus("error");
+    //     });
+    // }
   };
-
-  const filteredPokemon =
-    pokemon?.filter(
-      (singlePokemon) =>
-        singlePokemon.name.includes(filtersParams.name.toLowerCase() || "") &&
-        singlePokemon.types
-          .map((type) => type.type.name)
-          .find((typeName) => typeName.includes(filtersParams.type))
-    ) || null;
 
   return (
     <PokedexContext.Provider
@@ -161,7 +140,7 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
           fetchAll: fetchAllTypes,
         },
         filteredPokemon: {
-          data: filteredPokemon,
+          data: pokemon,
           status: pokemonStatus,
           fetchAll: fetchAllPokemon,
         },

@@ -10,8 +10,9 @@ const FilterInputs = () => {
 
   const handleInputChange =
     (filterParam: FilterParam) =>
-    (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) =>
+    (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
       filters.updateFilterParam(filterParam, event.target.value);
+    };
 
   return (
     <S.FilterInputsWrapper direction={["column", "row"]} spacing={8}>
