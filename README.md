@@ -1,6 +1,6 @@
 # Pokedex App
 
-This project was created using [Create React App](https://github.com/facebook/create-react-app) & [Pokenode-ts](https://pokenode-ts-docs-gabb-c.vercel.app/).
+This project was created using [Create React App](https://github.com/facebook/create-react-app).
 
 You san see the app live here: [https://pokedex-pokenode-ts.netlify.app/](https://pokedex-pokenode-ts.netlify.app/)
 

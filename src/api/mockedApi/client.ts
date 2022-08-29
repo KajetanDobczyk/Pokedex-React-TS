@@ -54,5 +54,12 @@ export class PokedexClient {
   /**
    * Returns a single pokemon selected by exact name match
    */
-  getPokemonByName(name: string) {}
+  getPokemonByName(name: string) {
+    return this.pokedex.get(
+      decodeURIComponent(name)
+        .split(" ")
+        .map((word) => `${word[0].toUpperCase()}${word.substring(1)}`)
+        .join(" ")
+    );
+  }
 }

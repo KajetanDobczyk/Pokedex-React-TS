@@ -72,6 +72,7 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
 
   useEffect(() => {
     fetchAllPokemon();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtersParams]);
 
   useEffect(() => {
@@ -102,23 +103,11 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
   };
 
   const updateSinglePokemonByName = async (name: string) => {
-    // if (pokemon?.length) {
-    //   const singlePokemon = pokemon.find((singlePokemon) => singlePokemon.name === name) || null;
-    //   setSinglePokemon(singlePokemon);
-    //   setSinglePokemonStatus(singlePokemon ? "success" : "error");
-    // } else {
-    //   setSinglePokemonStatus("inProgress");
-    //   await api.pokemon
-    //     .getPokemonByName(name)
-    //     .then(async (data) => {
-    //       setSinglePokemon(data);
-    //       setSinglePokemonStatus("success");
-    //     })
-    //     .catch((error) => {
-    //       setSinglePokemon(null);
-    //       setSinglePokemonStatus("error");
-    //     });
-    // }
+    setSinglePokemonStatus("inProgress");
+    const singlePokemon = api.pokemon.getPokemonByName(name) || null;
+
+    setSinglePokemon(singlePokemon);
+    setSinglePokemonStatus(singlePokemon ? "success" : "error");
   };
 
   return (
