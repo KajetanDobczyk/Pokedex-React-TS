@@ -1,5 +1,4 @@
 import { Pokemon } from "api/mockedApi/client";
-import Message from "common/components/Message";
 
 import { PokemonListItem } from "./components/PokemonListItem";
 import * as S from "./styles";

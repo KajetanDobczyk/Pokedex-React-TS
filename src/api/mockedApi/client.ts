@@ -28,23 +28,21 @@ export class PokedexClient {
    * Returns a list of pokemon filtered by name and or type
    */
   listPokemon({ name, type }: { name?: string; type?: string }) {
-    const pokemonArray = Array.from(this.pokedex.values());
+    let filteredPokemon = Array.from(this.pokedex.values());
 
-    if(!name?.length && !type?.length) {
-      return pokemonArray
+    if (!name?.length && !type?.length) {
+      return filteredPokemon;
     }
 
-    const filteredPokemon: Pokemon = [];
+    if (name?.length) {
+      filteredPokemon = filteredPokemon.filter((pokemon) =>
+        pokemon.name.english.toLowerCase().includes(name.toLowerCase())
+      );
+    }
 
-    pokemonArray.forEach(pokemon => {
-      const isPokemonFound = false;
-
-      if()
-
-      if((name && pokemon.name.english.toLowerCase().includes(name.toLowerCase())) || ) {
-        filteredPokemon.push(pokemon)
-      }
-    })
+    if (type?.length) {
+      filteredPokemon = filteredPokemon.filter((pokemon) => pokemon.type.includes(type));
+    }
 
     return filteredPokemon;
   }

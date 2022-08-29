@@ -88,12 +88,6 @@ const PokedexContextProvider = ({ children }: React.PropsWithChildren) => {
   const fetchAllPokemon = async () => {
     setPokemonStatus("inProgress");
 
-    if (!filtersParams.name.length && !filtersParams.type.length) {
-      setPokemon([]);
-      setPokemonStatus("success");
-      return;
-    }
-
     const fetchedPokemon = api.pokemon.listPokemon({
       name: filtersParams.name,
       type: filtersParams.type,

@@ -11,16 +11,14 @@ const Pokemon = () => {
   const { filteredPokemon, pokemonTypes } = useContext(PokedexContext);
 
   useEffect(() => {
-    // if (pokemonTypes.status === "idle") {
-    //   pokemonTypes.fetchAll();
-    // }
-    // if (filteredPokemon.status === "idle") {
-    //   filteredPokemon.fetchAll();
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (pokemonTypes.status === "idle") {
+      pokemonTypes.fetchAll();
+    }
+    if (filteredPokemon.status === "idle") {
+      filteredPokemon.fetchAll();
+    }
+    //eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  console.log(filteredPokemon, pokemonTypes);
 
   if (
     ["idle", "inProgress"].includes(filteredPokemon.status) ||

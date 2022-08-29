@@ -12,6 +12,7 @@ export const Nav = styled.nav`
   background-color: #fff;
   width: 100%;
   height: ${theme.headerHeight};
+  z-index: 1;
 `;
 
 export const StyledLogo = styled(Logo)`
